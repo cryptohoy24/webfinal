@@ -81,15 +81,9 @@ export function Header() {
       <div className="section-container">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
-              <Image
-                src="/logo-cryptohoy24.png"
-                alt="CryptoHoy24"
-                width={32}
-                height={32}
-                className="w-full h-full object-contain"
-              />
-            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500 text-white font-bold transition-transform group-hover:scale-105">
+  C
+</div>
             <span className="font-semibold text-base text-foreground">CryptoHoy24</span>
           </Link>
 
