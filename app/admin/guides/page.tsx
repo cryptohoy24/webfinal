@@ -37,7 +37,7 @@ export default function AdminGuidesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingGuide, setEditingGuide] = useState<Guide | null>(null);
-  const [deletingGuide, setDeleteingGuide] = useState<Guide | null>(null);
+  const [deletingGuide, setDeletingGuide] = useState<Guide | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -82,7 +82,7 @@ export default function AdminGuidesPage() {
         setGuides(data || []);
       }
     } catch (err) {
-      setError('Error al cargar guías');
+      setError('Error al cargar guias');
       console.error(err);
     }
   };
@@ -109,12 +109,7 @@ export default function AdminGuidesPage() {
 
   const openCreateDialog = () => {
     setEditingGuide(null);
-    setFormData({
-      slug: '',
-      title: '',
-      description: '',
-      is_published: true,
-    });
+    setFormData({ slug: '', title: '', description: '', is_published: true });
     setPdfFile(null);
     setUploadProgress('');
     setIsDialogOpen(true);
@@ -134,7 +129,7 @@ export default function AdminGuidesPage() {
   };
 
   const openDeleteDialog = (guide: Guide) => {
-    setDeleteingGuide(guide);
+    setDeletingGuide(guide);
     setIsDeleteDialogOpen(true);
   };
 
@@ -156,7 +151,7 @@ export default function AdminGuidesPage() {
 
   const handleSave = async () => {
     if (!formData.slug || !formData.title) {
-      setError('El slug y título son obligatorios');
+      setError('El slug y titulo son obligatorios');
       return;
     }
 
@@ -182,9 +177,7 @@ export default function AdminGuidesPage() {
             upsert: true,
           });
 
-        if (uploadError) {
-          throw uploadError;
-        }
+        if (uploadError) throw uploadError;
       }
 
       setUploadProgress('Guardando metadatos...');
@@ -212,14 +205,14 @@ export default function AdminGuidesPage() {
         if (insertError) throw insertError;
       }
 
-      setUploadProgress('¡Completado!');
+      setUploadProgress('Completado');
       await fetchGuides();
       setIsDialogOpen(false);
       setEditingGuide(null);
       setPdfFile(null);
     } catch (err: any) {
       console.error('Error saving guide:', err);
-      setError(err.message || 'Error al guardar la guía');
+      setError(err.message || 'Error al guardar la guia');
     } finally {
       setSaving(false);
       setUploadProgress('');
@@ -233,7 +226,6 @@ export default function AdminGuidesPage() {
     setError(null);
 
     try {
-      // Only delete file from storage if it exists
       if (deletingGuide.file_path) {
         await supabase.storage.from('guides').remove([deletingGuide.file_path]);
       }
@@ -247,10 +239,10 @@ export default function AdminGuidesPage() {
 
       await fetchGuides();
       setIsDeleteDialogOpen(false);
-      setDeleteingGuide(null);
+      setDeletingGuide(null);
     } catch (err: any) {
       console.error('Error deleting guide:', err);
-      setError(err.message || 'Error al eliminar la guía');
+      setError(err.message || 'Error al eliminar la guia');
     } finally {
       setSaving(false);
     }
@@ -258,7 +250,7 @@ export default function AdminGuidesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -266,8 +258,8 @@ export default function AdminGuidesPage() {
 
   if (!adminAccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-12 px-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-[60vh] flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
@@ -276,10 +268,10 @@ export default function AdminGuidesPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-6">
-              No tienes permisos de administrador para acceder a esta página.
+              No tienes permisos de administrador para acceder a esta pagina.
             </p>
             <Button onClick={() => router.push('/guia')} className="w-full">
-              Volver a mis guías
+              Volver a mis guias
             </Button>
           </CardContent>
         </Card>
@@ -288,28 +280,26 @@ export default function AdminGuidesPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <div className="section-container section-padding">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <Link href="/admin">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
+            <Button variant="ghost" size="sm" className="mb-4 gap-2">
+              <ArrowLeft className="h-4 w-4" />
               Volver al Panel
             </Button>
           </Link>
 
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-                Gestión de Guías PDF
-              </h1>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Gestion de Guias PDF</h1>
               <p className="text-muted-foreground">
-                Administra las guías disponibles para los usuarios
+                Administra las guias disponibles para los usuarios
               </p>
             </div>
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              Nueva Guía
+            <Button onClick={openCreateDialog} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Nueva Guia
             </Button>
           </div>
         </div>
@@ -321,18 +311,18 @@ export default function AdminGuidesPage() {
           </Alert>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Guías Disponibles ({guides.length})</CardTitle>
+        <Card className="border-border">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base font-semibold">Guias Disponibles ({guides.length})</CardTitle>
           </CardHeader>
           <CardContent>
             {guides.length === 0 ? (
               <div className="text-center py-12">
                 <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No hay guías creadas aún.</p>
-                <Button onClick={openCreateDialog}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Crear Primera Guía
+                <p className="text-muted-foreground mb-4">No hay guias creadas aun.</p>
+                <Button onClick={openCreateDialog} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Crear Primera Guia
                 </Button>
               </div>
             ) : (
@@ -340,70 +330,52 @@ export default function AdminGuidesPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Título</TableHead>
+                      <TableHead>Titulo</TableHead>
                       <TableHead>Slug</TableHead>
                       <TableHead>PDF</TableHead>
                       <TableHead>Estado</TableHead>
-                      <TableHead>Última Actualización</TableHead>
+                      <TableHead>Actualizado</TableHead>
                       <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {guides.map((guide) => (
                       <TableRow key={guide.id}>
-                        <TableCell className="font-medium">
+                        <TableCell className="font-medium text-sm">
                           {guide.title}
                           {!guide.file_path && (
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                              Sin PDF
-                            </span>
+                            <span className="ml-2 badge-warning">Sin PDF</span>
                           )}
                         </TableCell>
                         <TableCell>
-                          <code className="bg-muted px-2 py-1 rounded text-sm">
+                          <code className="bg-muted px-2 py-1 rounded text-xs">
                             {guide.slug}
                           </code>
                         </TableCell>
                         <TableCell>
                           {guide.file_path ? (
-                            <Check className="h-4 w-4 text-green-500" />
+                            <Check className="h-4 w-4 text-emerald-400" />
                           ) : (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openEditDialog(guide)}
-                            >
-                              <Upload className="mr-1 h-3 w-3" />
+                            <Button variant="outline" size="sm" onClick={() => openEditDialog(guide)} className="gap-1">
+                              <Upload className="h-3 w-3" />
                               Subir
                             </Button>
                           )}
                         </TableCell>
                         <TableCell>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            guide.is_published
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className={guide.is_published ? 'badge-success' : 'badge-neutral'}>
                             {guide.is_published ? 'Publicada' : 'Borrador'}
                           </span>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-sm">
                           {new Date(guide.updated_at).toLocaleDateString('es-ES')}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openEditDialog(guide)}
-                            >
+                            <Button variant="outline" size="sm" onClick={() => openEditDialog(guide)}>
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openDeleteDialog(guide)}
-                            >
+                            <Button variant="outline" size="sm" onClick={() => openDeleteDialog(guide)}>
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </div>
@@ -421,23 +393,23 @@ export default function AdminGuidesPage() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingGuide ? 'Editar Guía' : 'Nueva Guía'}
+                {editingGuide ? 'Editar Guia' : 'Nueva Guia'}
               </DialogTitle>
               <DialogDescription>
                 {editingGuide
-                  ? 'Modifica la información de la guía. Puedes actualizar el PDF subiendo uno nuevo.'
-                  : 'Completa la información para crear una nueva guía PDF.'}
+                  ? 'Modifica la informacion de la guia. Puedes actualizar el PDF subiendo uno nuevo.'
+                  : 'Completa la informacion para crear una nueva guia PDF.'}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Título *</Label>
+                <Label htmlFor="title">Titulo *</Label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Guía de P2P en Bybit"
+                  placeholder="Guia de P2P en Bybit"
                 />
               </div>
 
@@ -453,25 +425,25 @@ export default function AdminGuidesPage() {
                   placeholder="p2p-bybit"
                   disabled={!!editingGuide}
                 />
-                <p className="text-sm text-muted-foreground">
-                  Solo letras minúsculas, números y guiones. La URL será: /guia/{formData.slug || 'slug'}
+                <p className="text-xs text-muted-foreground">
+                  Solo letras minusculas, numeros y guiones.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Descripción</Label>
+                <Label htmlFor="description">Descripcion</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Descripción breve de la guía..."
+                  placeholder="Descripcion breve de la guia..."
                   rows={3}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="pdf">
-                  Archivo PDF {editingGuide ? '(opcional - mantener actual si no se sube)' : '(opcional - puedes subirlo después)'}
+                  Archivo PDF {editingGuide ? '(opcional)' : '(opcional)'}
                 </Label>
                 <div className="flex items-center gap-2">
                   <Input
@@ -480,20 +452,18 @@ export default function AdminGuidesPage() {
                     accept="application/pdf"
                     onChange={handleFileChange}
                   />
-                  {pdfFile && (
-                    <Check className="h-5 w-5 text-green-500" />
-                  )}
+                  {pdfFile && <Check className="h-5 w-5 text-emerald-400" />}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Máximo 20MB. Solo archivos PDF. {!editingGuide && 'Puedes crear la guía ahora y subir el PDF más tarde.'}
+                <p className="text-xs text-muted-foreground">
+                  Maximo 20MB. Solo archivos PDF.
                 </p>
               </div>
 
               <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                 <div>
-                  <Label htmlFor="published" className="font-medium">Publicar Guía</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Los usuarios podrán ver esta guía si está publicada
+                  <Label htmlFor="published" className="font-medium">Publicar Guia</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Los usuarios podran ver esta guia si esta publicada
                   </p>
                 </div>
                 <Switch
@@ -517,7 +487,7 @@ export default function AdminGuidesPage() {
               </Button>
               <Button onClick={handleSave} disabled={saving}>
                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {editingGuide ? 'Guardar Cambios' : 'Crear Guía'}
+                {editingGuide ? 'Guardar Cambios' : 'Crear Guia'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -526,10 +496,10 @@ export default function AdminGuidesPage() {
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>¿Eliminar guía?</DialogTitle>
+              <DialogTitle>¿Eliminar guia?</DialogTitle>
               <DialogDescription>
-                Esta acción eliminará permanentemente la guía &quot;{deletingGuide?.title}&quot; y su archivo PDF.
-                Esta acción no se puede deshacer.
+                Esta accion eliminara permanentemente la guia &quot;{deletingGuide?.title}&quot; y su archivo PDF.
+                Esta accion no se puede deshacer.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

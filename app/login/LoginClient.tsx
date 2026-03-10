@@ -9,11 +9,11 @@ import { supabase } from '@/lib/supabase';
 import { ensureUserProfile } from '@/lib/auth';
 import { loginSchema, type LoginFormData } from '@/lib/validation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { CircleAlert as AlertCircle, Loader as Loader2, Eye, EyeOff, Shield } from 'lucide-react';
 
 export default function LoginClient() {
   const router = useRouter();
@@ -49,14 +49,14 @@ export default function LoginClient() {
       await ensureUserProfile();
       router.push('/guia');
     } catch (error) {
-      setGeneralError('Ocurrió un error inesperado. Por favor intenta de nuevo.');
+      setGeneralError('Ocurrio un error inesperado. Por favor intenta de nuevo.');
       setIsLoading(false);
     }
   };
 
   const handleResetPassword = async (email: string) => {
     if (!email) {
-      setGeneralError('Ingresa tu email para resetear la contraseña');
+      setGeneralError('Ingresa tu email para resetear la contrasena');
       return;
     }
 
@@ -78,109 +78,117 @@ export default function LoginClient() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Inicia Sesión</CardTitle>
-          <CardDescription>
-            Accede a tus guías privadas y sigue tu progreso
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {generalError && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{generalError}</AlertDescription>
-            </Alert>
-          )}
-
-          {resetSent && (
-            <Alert className="mb-6 border-primary">
-              <AlertDescription className="text-primary">
-                Email de reseteo enviado. Revisa tu bandeja de entrada.
-              </AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="tu@email.com"
-                {...register('email')}
-                className={errors.email ? 'border-destructive' : ''}
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
-              )}
+    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <Card className="border-border">
+          <CardHeader className="space-y-1 pb-6">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold">C</span>
+              </div>
+            </div>
+            <CardTitle className="text-xl text-center">Inicia sesion</CardTitle>
+            <p className="text-sm text-muted-foreground text-center">
+              Accede a tus guias privadas
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary/50 border border-border mb-6">
+              <Shield className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+              <p className="text-xs text-muted-foreground">
+                Esta cuenta es solo para CryptoHoy24, no para Bybit.
+              </p>
             </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const email = (document.getElementById('email') as HTMLInputElement)?.value;
-                    handleResetPassword(email);
-                  }}
-                  className="text-xs text-primary hover:underline"
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
-              </div>
-              <div className="relative">
+            {generalError && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{generalError}</AlertDescription>
+              </Alert>
+            )}
+
+            {resetSent && (
+              <Alert className="mb-6 border-emerald-500/30 bg-emerald-500/5">
+                <AlertDescription className="text-emerald-400 text-sm">
+                  Email de reseteo enviado. Revisa tu bandeja de entrada.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  {...register('password')}
-                  className={errors.password ? 'border-destructive' : ''}
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  {...register('email')}
+                  className={errors.email ? 'border-destructive' : ''}
+                  autoComplete="email"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
+                {errors.email && (
+                  <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-sm text-destructive mt-1">{errors.password.message}</p>
-              )}
-            </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Iniciando sesión...
-                </>
-              ) : (
-                'Iniciar Sesión'
-              )}
-            </Button>
-          </form>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <Label htmlFor="password">Contrasena</Label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const email = (document.getElementById('email') as HTMLInputElement)?.value;
+                      handleResetPassword(email);
+                    }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    ¿Olvidaste tu contrasena?
+                  </button>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Tu contrasena"
+                    {...register('password')}
+                    className={errors.password ? 'border-destructive pr-10' : 'pr-10'}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive mt-1">{errors.password.message}</p>
+                )}
+              </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            ¿No tienes cuenta?{' '}
-            <Link href="/registro" className="text-primary hover:underline">
-              Regístrate ahora
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Iniciando sesion...
+                  </>
+                ) : (
+                  'Iniciar sesion'
+                )}
+              </Button>
+            </form>
+
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              ¿No tienes cuenta?{' '}
+              <Link href="/registro" className="text-primary hover:underline font-medium">
+                Registrate
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Download, AlertCircle, Users, BookOpen } from 'lucide-react';
+import { Loader as Loader2, Download, CircleAlert as AlertCircle, Users, BookOpen, Calendar, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserProfile {
@@ -72,7 +72,7 @@ export default function AdminPage() {
           setUsers(data || []);
         }
       } catch (err) {
-        setError('Error fetching users');
+        setError('Error al cargar usuarios');
         console.error(err);
       } finally {
         setLoading(false);
@@ -107,9 +107,21 @@ export default function AdminPage() {
     document.body.removeChild(a);
   };
 
+  const usersThisWeek = users.filter(u => {
+    const date = new Date(u.created_at);
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    return date > weekAgo;
+  }).length;
+
+  const usersThisMonth = users.filter(u => {
+    const date = new Date(u.created_at);
+    const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    return date > monthAgo;
+  }).length;
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -117,8 +129,8 @@ export default function AdminPage() {
 
   if (!adminAccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center py-12 px-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-[60vh] flex items-center justify-center py-12 px-4">
+        <Card className="w-full max-w-md border-border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-destructive" />
@@ -127,10 +139,10 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-6">
-              No tienes permisos de administrador para acceder a esta página. Si crees que es un error, contacta al propietario del sitio.
+              No tienes permisos de administrador para acceder a esta pagina.
             </p>
             <Button onClick={() => router.push('/guia')} className="w-full">
-              Volver a mis guías
+              Volver a mis guias
             </Button>
           </CardContent>
         </Card>
@@ -139,26 +151,24 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <div className="section-container section-padding">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-            Panel de Administración
-          </h1>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Panel de Administracion</h1>
           <p className="text-muted-foreground mb-6">
-            Gestión de usuarios y contenido de la plataforma
+            Gestion de usuarios y contenido
           </p>
 
           <div className="flex flex-wrap gap-3">
             <Link href="/admin/guides">
-              <Button>
-                <BookOpen className="mr-2 h-4 w-4" />
-                Gestionar Guías
+              <Button className="gap-2">
+                <BookOpen className="h-4 w-4" />
+                Gestionar Guias
               </Button>
             </Link>
-            <Button onClick={exportToCSV} disabled={users.length === 0} variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Exportar Usuarios CSV
+            <Button onClick={exportToCSV} disabled={users.length === 0} variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Exportar CSV
             </Button>
           </div>
         </div>
@@ -170,58 +180,56 @@ export default function AdminPage() {
           </Alert>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <Users className="h-4 w-4 text-primary" />
-                Total de Usuarios
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-primary">{users.length}</p>
+        <div className="grid sm:grid-cols-3 gap-4 mb-8">
+          <Card className="border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Total usuarios</p>
+                  <p className="text-2xl font-bold">{users.length}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Usuarios Esta Semana</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-primary">
-                {users.filter(u => {
-                  const date = new Date(u.created_at);
-                  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-                  return date > weekAgo;
-                }).length}
-              </p>
+          <Card className="border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Esta semana</p>
+                  <p className="text-2xl font-bold">{usersThisWeek}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Usuarios Este Mes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-primary">
-                {users.filter(u => {
-                  const date = new Date(u.created_at);
-                  const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-                  return date > monthAgo;
-                }).length}
-              </p>
+          <Card className="border-border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-sky-500/10 flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-sky-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Este mes</p>
+                  <p className="text-2xl font-bold">{usersThisMonth}</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Usuarios Registrados</CardTitle>
+        <Card className="border-border">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base font-semibold">Usuarios Registrados</CardTitle>
           </CardHeader>
           <CardContent>
             {users.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-muted-foreground">No hay usuarios registrados aún.</p>
+                <p className="text-muted-foreground">No hay usuarios registrados aun.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -231,18 +239,18 @@ export default function AdminPage() {
                       <TableHead>Email</TableHead>
                       <TableHead>UID de Bybit</TableHead>
                       <TableHead>Fecha de Registro</TableHead>
-                      <TableHead className="text-right">ID de Usuario</TableHead>
+                      <TableHead className="text-right">ID</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.email}</TableCell>
-                        <TableCell>{user.bybit_uid}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium text-sm">{user.email}</TableCell>
+                        <TableCell className="text-sm font-mono">{user.bybit_uid}</TableCell>
+                        <TableCell className="text-sm">
                           {new Date(user.created_at).toLocaleString('es-ES')}
                         </TableCell>
-                        <TableCell className="text-right text-xs text-muted-foreground">
+                        <TableCell className="text-right text-xs text-muted-foreground font-mono">
                           {user.id.substring(0, 8)}...
                         </TableCell>
                       </TableRow>

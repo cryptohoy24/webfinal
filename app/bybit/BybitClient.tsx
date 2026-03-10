@@ -3,36 +3,31 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, BookOpen, Shield, ExternalLink, ArrowRight, CheckCircle2, Info } from 'lucide-react';
+import { TriangleAlert as AlertTriangle, BookOpen, Shield, ExternalLink, ArrowRight, CircleCheck as CheckCircle2, Info, Lock } from 'lucide-react';
 
 export default function BybitClient() {
-  const scrollToInfoOficial = () => {
-    const element = document.getElementById('info-oficial');
-    element?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const steps = [
     {
-      title: 'Registro con referido (2 min)',
+      title: 'Crea tu cuenta en Bybit',
       description: [
-        'Haz clic en "Ir a informacion oficial" para acceder al formulario de Bybit.',
-        'En el formulario de Bybit, verifica que en "Codigo de referido" aparezca: 145564.',
-        'Si no aparece, escribelo manualmente: 145564.',
-        'Crea tu cuenta con tu email y establece una contrasena segura.',
+        'Accede al sitio oficial de Bybit a traves del enlace al final de esta guia.',
+        'Verifica que el codigo de referido 145564 aparezca en el formulario.',
+        'Si no aparece, escribelo manualmente antes de completar el registro.',
+        'Usa tu email y establece una contrasena segura (diferente a la de CryptoHoy24).',
       ],
     },
     {
-      title: 'Verificacion de identidad (KYC)',
+      title: 'Verifica tu identidad (KYC)',
       description: [
         'Inicia sesion en Bybit (app o web).',
         'Ve a Perfil → Verificacion de identidad / KYC.',
         'Documento recomendado: Cedula (tambien sirve pasaporte).',
         'Sube frontal y reverso + selfie/liveness como te pida el sistema.',
-        'Espera la aprobacion (normalmente minutos; a veces puede tardar mas).',
+        'Espera la aprobacion (normalmente minutos, a veces puede tardar mas).',
       ],
     },
     {
-      title: 'Activar la promocion de bienvenida',
+      title: 'Activa la promocion de bienvenida',
       description: [
         'Una vez verificado, accede a la seccion de promociones de Bybit.',
         'Busca la promocion de bienvenida para nuevos usuarios.',
@@ -41,12 +36,12 @@ export default function BybitClient() {
       ],
     },
     {
-      title: 'Deposito inicial',
+      title: 'Realiza tu primer deposito',
       description: [
-        'Realiza un deposito segun los requisitos de la promocion.',
-        'Opcion A – P2P en Bybit: compra USDT y recibelos en tu billetera Spot.',
-        'Opcion B – Transferencia externa: envia USDT desde otro exchange o wallet.',
-        'Verifica los montos minimos requeridos en los terminos de la promocion.',
+        'Deposita segun los requisitos de la promocion que deseas activar.',
+        'Opcion A: Compra USDT por P2P directamente en Bybit.',
+        'Opcion B: Transfiere USDT desde otro exchange o wallet.',
+        'Verifica los montos minimos en los terminos de cada promocion.',
       ],
     },
     {
@@ -54,11 +49,11 @@ export default function BybitClient() {
       description: [
         'Algunas promociones requieren mantener fondos por un periodo determinado.',
         'Consulta los terminos especificos de cada promocion.',
-        'Tip: Puedes colocar tus fondos en Earn/Ahorros para generar rendimientos mientras esperas.',
+        'Puedes colocar tus fondos en Earn/Ahorros para generar rendimientos mientras esperas.',
       ],
     },
     {
-      title: 'Recibir y usar beneficios',
+      title: 'Recibe y usa los beneficios',
       description: [
         'Cumplidos los requisitos, los beneficios se acreditaran segun los terminos.',
         'Revisa tu cuenta para confirmar la recepcion.',
@@ -69,150 +64,120 @@ export default function BybitClient() {
 
   return (
     <div className="w-full">
-      <section className="relative px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="text-center mb-8">
+      <section className="section-container section-padding">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-5">
+              <BookOpen className="h-3.5 w-3.5" />
+              Guia educativa
+            </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-              Guia para empezar en Bybit paso a paso
+              Como empezar en Bybit paso a paso
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Aprende como crear tu cuenta, verificar tu identidad y comenzar a operar en Bybit de forma segura y ordenada.
             </p>
           </div>
 
-          <Card className="border-blue-500/50 bg-blue-500/10 mb-6">
-            <CardContent className="p-6">
-              <div className="flex gap-4">
-                <Info className="h-6 w-6 text-blue-500 flex-shrink-0 mt-0.5" />
+          <div className="grid sm:grid-cols-3 gap-4 mb-12">
+            <div className="notice-info">
+              <div className="flex gap-3">
+                <Info className="h-5 w-5 text-sky-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h2 className="font-semibold text-blue-500 mb-2">Transparencia</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    CryptoHoy24 no es Bybit. Somos un sitio educativo independiente y no representamos oficialmente a Bybit.
-                    Algunos enlaces pueden ser de afiliado, sin costo adicional para ti.
+                  <p className="text-sm font-medium text-sky-400 mb-1">Independencia</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    CryptoHoy24 no es Bybit. Somos un sitio educativo independiente. Algunos enlaces pueden ser de afiliado.
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-red-500/50 bg-red-500/10 mb-6">
-            <CardContent className="p-6">
-              <div className="flex gap-4">
-                <Shield className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="notice-danger">
+              <div className="flex gap-3">
+                <Lock className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h2 className="font-semibold text-red-500 mb-2">Seguridad</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Nunca te pediremos tu contrasena de Bybit, codigos 2FA/SMS, claves API ni datos bancarios.
-                    Si alguien te pide esta informacion, es un intento de fraude.
+                  <p className="text-sm font-medium text-red-400 mb-1">Seguridad</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Nunca te pediremos contrasenas, codigos 2FA, claves API ni datos bancarios.
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-amber-500/50 bg-amber-500/10 mb-12">
-            <CardContent className="p-6">
-              <div className="flex gap-4">
-                <AlertTriangle className="h-6 w-6 text-amber-500 flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="notice-warning">
+              <div className="flex gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h2 className="font-semibold text-amber-500 mb-2">Aviso importante</h2>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    CryptoHoy24 es un sitio educativo y no ofrece asesoramiento financiero.
-                    Operar con criptomonedas implica riesgos significativos, incluyendo la posible perdida total del capital invertido.
-                    Promociones, bonos y recompensas dependen exclusivamente de Bybit y pueden cambiar o cancelarse en cualquier momento.
+                  <p className="text-sm font-medium text-amber-400 mb-1">Riesgos</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Operar con criptomonedas implica riesgos. Promociones dependen de Bybit y pueden cambiar.
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <section className="mb-12">
+          <div className="rounded-lg border border-border bg-card p-6 sm:p-8 mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold">Que es Bybit</h2>
+              <BookOpen className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Que es Bybit</h2>
             </div>
-            <div className="bg-card rounded-lg border border-border p-6">
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                Bybit es una plataforma de intercambio de criptomonedas fundada en 2018.
-                Ofrece servicios de trading spot, derivados, y operaciones P2P (peer-to-peer)
-                que permiten comprar y vender criptomonedas directamente entre usuarios.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Como cualquier plataforma de trading, operar en Bybit conlleva riesgos.
-                Es importante que investigues, entiendas los productos que utilizas,
-                y nunca inviertas mas de lo que puedas permitirte perder.
-              </p>
-            </div>
-          </section>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+              Bybit es una plataforma de intercambio de criptomonedas fundada en 2018.
+              Ofrece servicios de trading spot, derivados, y operaciones P2P (peer-to-peer)
+              que permiten comprar y vender criptomonedas directamente entre usuarios.
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Como cualquier plataforma de trading, operar en Bybit conlleva riesgos.
+              Es importante que investigues, entiendas los productos que utilizas,
+              y nunca inviertas mas de lo que puedas permitirte perder.
+            </p>
+          </div>
 
-          <section className="mb-12">
+          <div className="rounded-lg border border-border bg-card p-6 sm:p-8 mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="h-6 w-6 text-primary" />
-              <h2 className="text-2xl font-bold">Sobre el bono de bienvenida</h2>
+              <Shield className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Sobre el bono de bienvenida</h2>
             </div>
-            <div className="bg-card rounded-lg border border-border p-6">
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                Bybit puede ofrecer promociones de bienvenida para nuevos usuarios que se registren
-                a traves de enlaces de referido. Estas promociones estan sujetas a:
-              </p>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-1">•</span>
-                  <span>Terminos y condiciones establecidos por Bybit</span>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+              Bybit puede ofrecer promociones de bienvenida para nuevos usuarios registrados
+              a traves de enlaces de referido. Estas promociones estan sujetas a:
+            </p>
+            <ul className="space-y-2 mb-4">
+              {[
+                'Terminos y condiciones establecidos por Bybit',
+                'Requisitos de elegibilidad (verificacion KYC, deposito minimo, etc.)',
+                'Disponibilidad geografica y restricciones por pais',
+                'Cambios o cancelaciones sin previo aviso',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <span className="text-primary mt-0.5 text-xs">&#9679;</span>
+                  <span>{item}</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-1">•</span>
-                  <span>Requisitos de elegibilidad (verificacion KYC, deposito minimo, etc.)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-1">•</span>
-                  <span>Disponibilidad geografica y restricciones por pais</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-primary mt-1">•</span>
-                  <span>Cambios o cancelaciones sin previo aviso</span>
-                </li>
-              </ul>
-              <p className="text-muted-foreground leading-relaxed mt-4 text-sm">
-                Siempre lee los terminos completos de cualquier promocion antes de participar.
-                Los beneficios no estan garantizados y dependen del cumplimiento de todos los requisitos.
-              </p>
-            </div>
-          </section>
+              ))}
+            </ul>
+            <p className="text-xs text-muted-foreground">
+              Siempre lee los terminos completos de cualquier promocion antes de participar.
+              Los beneficios no estan garantizados y dependen del cumplimiento de todos los requisitos.
+            </p>
+          </div>
 
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6">Como empezar en Bybit (paso a paso)</h2>
-
-            <Card className="border-primary/30 bg-primary/5 mb-6">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between flex-wrap gap-4">
-                  <div>
-                    <p className="font-medium mb-1">Codigo de referido</p>
-                    <p className="text-2xl font-bold text-primary">145564</p>
-                  </div>
-                  <Button onClick={scrollToInfoOficial}>
-                    Ir a informacion oficial
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-8">Paso a paso para empezar en Bybit</h2>
 
             <div className="space-y-4">
               {steps.map((step, index) => (
-                <div key={index} className="bg-card rounded-lg border border-border p-6">
+                <div key={index} className="rounded-lg border border-border bg-card p-6 hover:border-primary/20 transition-colors">
                   <div className="flex gap-4">
                     <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary text-primary-foreground font-bold">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary font-bold text-sm">
                         {index + 1}
                       </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold mb-3">{step.title}</h3>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold mb-3">{step.title}</h3>
                       <ul className="space-y-2">
                         {step.description.map((line, lineIndex) => (
-                          <li key={lineIndex} className="text-muted-foreground flex items-start gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
+                          <li key={lineIndex} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-primary/60 flex-shrink-0 mt-0.5" />
                             <span>{line}</span>
                           </li>
                         ))}
@@ -222,76 +187,73 @@ export default function BybitClient() {
                 </div>
               ))}
             </div>
-          </section>
+          </div>
 
-          <section id="info-oficial" className="mb-12">
-            <Card className="border-red-500/50 bg-red-500/10 mb-6">
-              <CardContent className="p-4">
-                <div className="flex gap-4">
-                  <Shield className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      <strong className="text-red-500">Recordatorio de seguridad:</strong> Nunca te pediremos tu contrasena de Bybit, codigos 2FA/SMS, claves API ni datos bancarios.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="rounded-lg border border-border bg-card p-6 sm:p-8 text-center mb-8">
+            <h2 className="text-xl font-semibold mb-2">Ir al sitio oficial de Bybit</h2>
+            <p className="text-sm text-muted-foreground mb-2">
+              Codigo de referido: <span className="font-mono text-foreground">145564</span>
+            </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Para conocer los terminos actuales, promociones vigentes y requisitos completos,
+              visita el sitio oficial.
+            </p>
+            <a
+              href="https://partner.bybit.com/b/145564"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" className="gap-2">
+                Ver informacion oficial en Bybit
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </a>
+          </div>
 
-            <div className="bg-card rounded-lg border border-border p-6 text-center">
-              <h2 className="text-xl font-bold mb-4">Informacion oficial</h2>
-              <p className="text-muted-foreground mb-6">
-                Para conocer los terminos actuales, promociones vigentes y requisitos completos,
-                visita el sitio oficial de Bybit.
+          <div className="notice-danger mb-12">
+            <div className="flex gap-3">
+              <Shield className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-muted-foreground">
+                <span className="font-medium text-red-400">Recordatorio de seguridad:</span> Nunca te pediremos tu contrasena de Bybit, codigos 2FA/SMS, claves API ni datos bancarios.
+                Si alguien te pide esta informacion, es un intento de fraude.
               </p>
-              <a
-                href="https://partner.bybit.com/b/145564"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button size="lg">
-                  Ver informacion oficial en Bybit
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
             </div>
-          </section>
+          </div>
 
-          <section className="border-t border-border pt-12">
-            <h2 className="text-xl font-bold mb-6 text-center">Continua en CryptoHoy24</h2>
+          <div className="border-t border-border pt-10">
+            <h2 className="text-lg font-semibold mb-6 text-center">Continua en CryptoHoy24</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <Link href="/registro">
-                <Card className="border-border hover:border-primary transition cursor-pointer h-full">
+                <Card className="border-border hover:border-primary/30 transition-colors cursor-pointer h-full">
                   <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2">Crear cuenta y acceder a las guias</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Registrate en CryptoHoy24 para desbloquear contenido educativo sobre P2P y Earn.
+                    <h3 className="text-sm font-semibold mb-2">Crear cuenta y acceder a las guias</h3>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Registrate en CryptoHoy24 para desbloquear contenido educativo sobre P2P, Earn y mas.
                     </p>
-                    <span className="text-primary text-sm font-medium inline-flex items-center">
-                      Ir a registro <ArrowRight className="ml-1 h-4 w-4" />
+                    <span className="text-primary text-xs font-medium inline-flex items-center">
+                      Ir a registro <ArrowRight className="ml-1 h-3.5 w-3.5" />
                     </span>
                   </CardContent>
                 </Card>
               </Link>
               <Link href="/comerciantes">
-                <Card className="border-border hover:border-primary transition cursor-pointer h-full">
+                <Card className="border-border hover:border-primary/30 transition-colors cursor-pointer h-full">
                   <CardContent className="p-6">
-                    <h3 className="font-semibold mb-2">Ver beneficios para comerciantes P2P</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <h3 className="text-sm font-semibold mb-2">Programa de comerciantes P2P</h3>
+                    <p className="text-xs text-muted-foreground mb-3">
                       Conoce los requisitos y beneficios del programa de comerciantes verificados.
                     </p>
-                    <span className="text-primary text-sm font-medium inline-flex items-center">
-                      Ver mas <ArrowRight className="ml-1 h-4 w-4" />
+                    <span className="text-primary text-xs font-medium inline-flex items-center">
+                      Ver mas <ArrowRight className="ml-1 h-3.5 w-3.5" />
                     </span>
                   </CardContent>
                 </Card>
               </Link>
             </div>
-          </section>
+          </div>
 
-          <p className="text-xs text-muted-foreground text-center mt-12">
-            Este contenido es educativo. Operar con criptomonedas implica riesgos.
-            Nunca inviertas mas de lo que puedas permitirte perder.
+          <p className="text-xs text-muted-foreground text-center mt-10">
+            Este contenido es educativo. No es asesoria financiera. Operar con criptomonedas implica riesgos.
           </p>
         </div>
       </section>

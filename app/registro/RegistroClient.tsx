@@ -1,227 +1,308 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/lib/supabase';
+import { ensureUserProfile } from '@/lib/auth';
 import { registrationSchema, type RegistrationFormData } from '@/lib/validation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { CircleAlert as AlertCircle, Loader as Loader2, Eye, EyeOff, CircleHelp as HelpCircle, FileText, Shield, Info } from 'lucide-react';
+
+function PasswordStrength({ password }: { password: string }) {
+  const strength = useMemo(() => {
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    return score;
+  }, [password]);
+
+  if (!password) return null;
+
+  const labels = ['Muy debil', 'Debil', 'Regular', 'Buena', 'Fuerte'];
+  const colors = ['bg-red-500', 'bg-red-400', 'bg-amber-400', 'bg-emerald-400', 'bg-emerald-500'];
+
+  return (
+    <div className="space-y-1.5 mt-2">
+      <div className="flex gap-1">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className={`h-1 flex-1 rounded-full transition-colors ${
+              i < strength ? colors[strength - 1] : 'bg-border'
+            }`}
+          />
+        ))}
+      </div>
+      <p className="text-xs text-muted-foreground">{labels[Math.max(0, strength - 1)]}</p>
+    </div>
+  );
+}
 
 export default function RegistroClient() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showUidHelp, setShowUidHelp] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    setValue,
     watch,
+    setValue,
+    formState: { errors },
   } = useForm<RegistrationFormData>({
     resolver: zodResolver(registrationSchema),
+    defaultValues: {
+      terms: false,
+    },
   });
 
-  const termsValue = watch('terms');
+  const password = watch('password') || '';
+  const termsAccepted = watch('terms');
 
   const onSubmit = async (data: RegistrationFormData) => {
     setIsLoading(true);
     setGeneralError(null);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
       });
 
-      if (authError) {
-        if (authError.message.includes('already registered')) {
-          setGeneralError('Este email ya está registrado. Por favor inicia sesión.');
-        } else {
-          setGeneralError(authError.message);
+      if (signUpError) {
+        setGeneralError(signUpError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('users_profile')
+          .upsert({
+            id: authData.user.id,
+            email: data.email,
+            bybit_uid: data.bybit_uid,
+            role: 'user',
+          });
+
+        if (profileError) {
+          if (profileError.message.includes('duplicate') || profileError.message.includes('unique')) {
+            setGeneralError('Este email o UID de Bybit ya esta registrado.');
+          } else {
+            setGeneralError(profileError.message);
+          }
+          setIsLoading(false);
+          return;
         }
-        setIsLoading(false);
-        return;
       }
 
-      if (!authData.user) {
-        setGeneralError('Error al crear la cuenta. Por favor intenta de nuevo.');
-        setIsLoading(false);
-        return;
-      }
-
-      const { error: profileError } = await supabase
-        .from('users_profile')
-        .insert({
-          id: authData.user.id,
-          email: data.email,
-          bybit_uid: data.bybit_uid,
-        });
-
-      if (profileError) {
-        if (profileError.message.includes('duplicate') || profileError.message.includes('unique')) {
-          setGeneralError('Este UID de Bybit ya está registrado. Cada UID solo puede usarse una vez.');
-        } else {
-          setGeneralError('Error al guardar tu perfil. Por favor intenta de nuevo.');
-        }
-        setIsLoading(false);
-        return;
-      }
-
+      await ensureUserProfile();
       router.push('/guia');
     } catch (error) {
-      setGeneralError('Ocurrió un error inesperado. Por favor intenta de nuevo.');
+      setGeneralError('Ocurrio un error inesperado. Por favor intenta de nuevo.');
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Crea tu Cuenta</CardTitle>
-          <CardDescription>
-            Regístrate para acceder a las 2 guías privadas
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {generalError && (
-            <Alert variant="destructive" className="mb-6">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{generalError}</AlertDescription>
-            </Alert>
-          )}
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="tu@email.com"
-                {...register('email')}
-                className={errors.email ? 'border-destructive' : ''}
-              />
-              {errors.email && (
-                <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
-              )}
+    <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        <Card className="border-border">
+          <CardHeader className="space-y-1 pb-6">
+            <div className="flex items-center justify-center mb-2">
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold">C</span>
+              </div>
             </div>
-
-            <div>
-              <Label htmlFor="bybit_uid">UID de Bybit * (requerido)</Label>
-              <Input
-                id="bybit_uid"
-                type="text"
-                placeholder="123456789"
-                {...register('bybit_uid')}
-                className={errors.bybit_uid ? 'border-destructive' : ''}
-                maxLength={20}
-              />
-              {errors.bybit_uid && (
-                <p className="text-sm text-destructive mt-1">{errors.bybit_uid.message}</p>
-              )}
-              <p className="text-xs text-muted-foreground mt-1">
-                Solo números, mínimo 6 dígitos. Lo encontrarás en tu perfil de Bybit.
-              </p>
-
-              <div className="mt-3 p-3 border border-border rounded-lg bg-card">
-                <p className="text-sm text-muted-foreground mb-2">
-                  ¿Aun no tienes UID de Bybit? Consulta nuestra guia para crear tu cuenta.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  asChild
-                >
-                  <Link href="/bybit">
-                    Ver guia para crear cuenta en Bybit
-                  </Link>
-                </Button>
+            <CardTitle className="text-xl text-center">Crea tu cuenta</CardTitle>
+            <p className="text-sm text-muted-foreground text-center">
+              Registrate para acceder a las guias educativas privadas
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md bg-secondary/50 border border-border p-3 mb-6">
+              <div className="flex items-start gap-2">
+                <FileText className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-muted-foreground">
+                  <p className="font-medium text-foreground mb-1">Al registrarte obtendras:</p>
+                  <ul className="space-y-0.5">
+                    <li>Acceso inmediato a guias en formato PDF</li>
+                    <li>Contenido sobre P2P, Earn y herramientas cripto</li>
+                    <li>Acceso gratuito y sin costos ocultos</li>
+                  </ul>
+                </div>
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="password">Contraseña *</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  {...register('password')}
-                  className={errors.password ? 'border-destructive' : ''}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-destructive mt-1">{errors.password.message}</p>
-              )}
-              <p className="text-xs text-muted-foreground mt-1">
-                Mínimo 8 caracteres, una mayúscula y un número.
-              </p>
-              <p className="text-xs font-medium text-blue-500 mt-2">
-                Esta contraseña es SOLO para tu cuenta en CryptoHoy24.
-              </p>
-            </div>
-
-            <div className="flex items-start space-x-2">
-              <Checkbox
-                id="terms"
-                checked={termsValue}
-                onCheckedChange={(checked) => setValue('terms', checked as boolean)}
-              />
-              <Label htmlFor="terms" className="text-sm font-normal cursor-pointer">
-                Acepto los términos y condiciones. Entiendo que este es contenido educativo y no asesoría financiera. *
-              </Label>
-            </div>
-            {errors.terms && (
-              <p className="text-sm text-destructive">{errors.terms.message}</p>
+            {generalError && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{generalError}</AlertDescription>
+              </Alert>
             )}
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registrando...
-                </>
-              ) : (
-                'Registrarse'
-              )}
-            </Button>
-          </form>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  {...register('email')}
+                  className={errors.email ? 'border-destructive' : ''}
+                  autoComplete="email"
+                />
+                {errors.email && (
+                  <p className="text-xs text-destructive mt-1">{errors.email.message}</p>
+                )}
+              </div>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            ¿Ya tienes cuenta?{' '}
-            <Link href="/login" className="text-primary hover:underline">
-              Inicia sesión
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="bybit_uid">UID de Bybit</Label>
+                  <button
+                    type="button"
+                    onClick={() => setShowUidHelp(!showUidHelp)}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Informacion sobre el UID de Bybit"
+                  >
+                    <HelpCircle className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+                <Input
+                  id="bybit_uid"
+                  type="text"
+                  placeholder="Ej: 12345678"
+                  {...register('bybit_uid')}
+                  className={errors.bybit_uid ? 'border-destructive' : ''}
+                  inputMode="numeric"
+                />
+                {errors.bybit_uid && (
+                  <p className="text-xs text-destructive mt-1">{errors.bybit_uid.message}</p>
+                )}
+
+                {showUidHelp && (
+                  <div className="rounded-md bg-secondary/50 border border-border p-3 mt-2 animate-fade-in">
+                    <div className="flex gap-2">
+                      <Info className="h-4 w-4 text-sky-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-xs text-muted-foreground space-y-1.5">
+                        <p className="font-medium text-foreground">¿Que es el UID y para que se usa?</p>
+                        <p>El UID es tu numero publico de identificacion en Bybit. Lo encuentras en tu perfil dentro de la app o web de Bybit.</p>
+                        <p>Lo usamos para verificar que te registraste en Bybit a traves de nuestro enlace de referido.</p>
+                        <p className="font-medium text-foreground">¿Que NO permite el UID?</p>
+                        <p>El UID no da acceso a tu cuenta, fondos, contrasena ni informacion sensible. Es un numero publico, no una credencial.</p>
+                        <p>
+                          ¿Aun no tienes cuenta en Bybit?{' '}
+                          <Link href="/bybit" className="text-primary hover:underline">Sigue nuestra guia</Link>.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Contrasena</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Minimo 8 caracteres"
+                    {...register('password')}
+                    className={errors.password ? 'border-destructive pr-10' : 'pr-10'}
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-xs text-destructive mt-1">{errors.password.message}</p>
+                )}
+                <PasswordStrength password={password} />
+                <div className="flex items-start gap-2 mt-2">
+                  <Shield className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-muted-foreground">
+                    No uses la misma contrasena que usas en Bybit u otras plataformas.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3 pt-2">
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="terms"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setValue('terms', !!checked, { shouldValidate: true })}
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="terms" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    Acepto los{' '}
+                    <Link href="/aviso-legal" className="text-primary hover:underline" target="_blank">
+                      terminos y condiciones
+                    </Link>{' '}
+                    y la{' '}
+                    <Link href="/privacidad" className="text-primary hover:underline" target="_blank">
+                      politica de privacidad
+                    </Link>.
+                  </Label>
+                </div>
+                {errors.terms && (
+                  <p className="text-xs text-destructive">{errors.terms.message}</p>
+                )}
+
+                <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
+                  Al registrarte entiendes que CryptoHoy24 es un sitio educativo independiente. El contenido no constituye asesoria financiera.
+                  Operar con criptomonedas implica riesgos significativos.
+                </p>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creando cuenta...
+                  </>
+                ) : (
+                  'Crear cuenta'
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-4 rounded-md bg-secondary/30 border border-border p-3">
+              <p className="text-[11px] text-muted-foreground text-center leading-relaxed">
+                Al completar el registro tendras acceso inmediato a todas las guias disponibles.
+                No se realizara ningun cobro. Tu email y UID se almacenan de forma segura.
+              </p>
+            </div>
+
+            <p className="text-center text-sm text-muted-foreground mt-5">
+              ¿Ya tienes cuenta?{' '}
+              <Link href="/login" className="text-primary hover:underline font-medium">
+                Inicia sesion
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
