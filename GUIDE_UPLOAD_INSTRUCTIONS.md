@@ -144,3 +144,4 @@ Una vez que hayas verificado que los PDFs se cargan correctamente desde Supabase
 - Algunos navegadores bloquean iframes con PDFs desde APIs
 - Los usuarios pueden usar el botón "Descargar PDF" como alternativa
 - Considera implementar un visor de PDF personalizado si es necesario
+-
