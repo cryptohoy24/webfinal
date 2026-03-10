@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { isAdmin } from '@/lib/auth';
@@ -80,8 +81,14 @@ export function Header() {
       <div className="section-container">
         <div className="flex justify-between items-center h-16">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
-              <span className="text-primary-foreground font-bold text-sm">C</span>
+            <div className="w-8 h-8 rounded-lg overflow-hidden transition-transform group-hover:scale-105">
+              <Image
+                src="/logo-cryptohoy24.png"
+                alt="CryptoHoy24"
+                width={32}
+                height={32}
+                className="w-full h-full object-contain"
+              />
             </div>
             <span className="font-semibold text-base text-foreground">CryptoHoy24</span>
           </Link>

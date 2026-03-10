@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/lib/supabase';
@@ -141,8 +142,14 @@ export default function RegistroClient() {
         <Card className="border-border">
           <CardHeader className="space-y-1 pb-6">
             <div className="flex items-center justify-center mb-2">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold">C</span>
+              <div className="w-12 h-12 rounded-lg overflow-hidden">
+                <Image
+                  src="/logo-cryptohoy24.png"
+                  alt="CryptoHoy24"
+                  width={48}
+                  height={48}
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
             <CardTitle className="text-xl text-center">Crea tu cuenta</CardTitle>
