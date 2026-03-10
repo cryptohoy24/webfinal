@@ -1,0 +1,21 @@
+[build]
+command = "npx next build"
+publish = ".next"
+
+[[plugins]]
+package = "@netlify/plugin-nextjs"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"
+
+[[headers]]
+  for = "/login*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"
+
+[[headers]]
+  for = "/registro*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, nosnippet"

@@ -1,0 +1,11 @@
+# Admin routes - prevent indexing by search engines
+/admin/*
+  X-Robots-Tag: noindex, nofollow, nosnippet
+
+# Login page - prevent indexing by search engines
+/login
+  X-Robots-Tag: noindex, nofollow, nosnippet
+
+# Registro page - prevent indexing by search engines
+/registro
+  X-Robots-Tag: noindex, nofollow, nosnippet

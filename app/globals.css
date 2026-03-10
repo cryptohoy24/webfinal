@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Opcional: mantener rgb por compatibilidad, pero con negro neutro */
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 245, 245, 245;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    /* negro neutro (sin tono azul) */
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer base {
+  :root {
+    /* Light theme (por si alguien usa claro) */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Naranja Bitcoin como color principal */
+    --primary: 30 95% 55%;
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 30 95% 55%;
+
+    --chart-1: 30 95% 55%;
+    --chart-2: 20 90% 50%;
+    --chart-3: 40 85% 55%;
+    --chart-4: 173 58% 39%;
+    --chart-5: 197 37% 24%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* ✅ Dos tonos de negro neutro:
+       - background = hero/fondo principal (negro un poquito más claro)
+       - card = barra de arriba / nav (negro más oscuro) */
+
+    --background: 0 0% 6%;         /* negro principal (hero) */
+    --foreground: 210 40% 98%;
+
+    --card: 0 0% 3.5%;             /* negro más oscuro (header/nav) */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    /* PRIMARIO naranja Bitcoin */
+    --primary: 30 95% 55%;
+    --primary-foreground: 0 0% 5%;
+
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 0 0% 12%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 30 95% 55%;
+
+    /* Gráficas/acentos coherentes con naranja */
+    --chart-1: 30 95% 55%;
+    --chart-2: 20 90% 50%;
+    --chart-3: 40 85% 55%;
+    --chart-4: 173 58% 39%;
+    --chart-5: 197 37% 24%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
