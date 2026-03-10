@@ -98,15 +98,9 @@ export default function LoginClient() {
         <Card className="border-border">
           <CardHeader className="space-y-1 pb-6">
             <div className="flex items-center justify-center mb-2">
-              <div className="w-12 h-12 rounded-lg overflow-hidden">
-                <Image
-                  src="/logo-cryptohoy24.png"
-                  alt="CryptoHoy24"
-                  width={48}
-                  height={48}
-                  className="w-full h-full object-contain"
-                />
-              </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500 text-white font-bold transition-transform group-hover:scale-105">
+  C
+</div>
             </div>
             <CardTitle className="text-xl text-center">Inicia sesion</CardTitle>
             <p className="text-sm text-muted-foreground text-center">
