@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { supabase } from '@/lib/supabase';
-import { ensureUserProfile } from '@/lib/auth';
 import { registrationSchema, type RegistrationFormData } from '@/lib/validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +13,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CircleAlert as AlertCircle, Loader as Loader2, Eye, EyeOff, CircleHelp as HelpCircle, FileText, Shield, Info } from 'lucide-react';
+import { CircleAlert as AlertCircle, CircleCheck as CheckCircle2, Loader as Loader2, Eye, EyeOff, CircleHelp as HelpCircle, FileText, Shield, Info } from 'lucide-react';
+
+function translateAuthError(message: string): string {
+  const map: Record<string, string> = {
+    'User already registered': 'Este email ya esta registrado',
+    'Invalid login credentials': 'Email o contrasena incorrectos',
+    'Email not confirmed': 'Debes confirmar tu email antes de iniciar sesion',
+    'Too many requests': 'Demasiados intentos. Por favor espera unos minutos.',
+    'Password should be at least': 'La contrasena debe tener al menos 8 caracteres',
+  };
+  for (const [key, value] of Object.entries(map)) {
+    if (message.toLowerCase().includes(key.toLowerCase())) return value;
+  }
+  return message;
+}
 
 function PasswordStrength({ password }: { password: string }) {
   const strength = useMemo(() => {
@@ -53,6 +66,7 @@ export default function RegistroClient() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showUidHelp, setShowUidHelp] = useState(false);
 
@@ -83,7 +97,7 @@ export default function RegistroClient() {
       });
 
       if (signUpError) {
-        setGeneralError(signUpError.message);
+        setGeneralError(translateAuthError(signUpError.message));
         setIsLoading(false);
         return;
       }
@@ -102,15 +116,19 @@ export default function RegistroClient() {
           if (profileError.message.includes('duplicate') || profileError.message.includes('unique')) {
             setGeneralError('Este email o UID de Bybit ya esta registrado.');
           } else {
-            setGeneralError(profileError.message);
+            setGeneralError(translateAuthError(profileError.message));
           }
           setIsLoading(false);
           return;
         }
       }
 
-      await ensureUserProfile();
-      router.push('/guia');
+      if (authData.session) {
+        router.push('/guia');
+      } else {
+        setRegistrationSuccess(true);
+        setIsLoading(false);
+      }
     } catch (error) {
       setGeneralError('Ocurrio un error inesperado. Por favor intenta de nuevo.');
       setIsLoading(false);
@@ -151,6 +169,15 @@ export default function RegistroClient() {
               <Alert variant="destructive" className="mb-6">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{generalError}</AlertDescription>
+              </Alert>
+            )}
+
+            {registrationSuccess && (
+              <Alert className="mb-6 border-emerald-500/30 bg-emerald-500/5">
+                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                <AlertDescription className="text-emerald-400 text-sm">
+                  Cuenta creada con exito. Revisa tu email para confirmar tu cuenta antes de iniciar sesion.
+                </AlertDescription>
               </Alert>
             )}
 

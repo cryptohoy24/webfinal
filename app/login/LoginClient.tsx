@@ -15,6 +15,20 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CircleAlert as AlertCircle, Loader as Loader2, Eye, EyeOff, Shield } from 'lucide-react';
 
+function translateAuthError(message: string): string {
+  const map: Record<string, string> = {
+    'Invalid login credentials': 'Email o contrasena incorrectos',
+    'Email not confirmed': 'Debes confirmar tu email antes de iniciar sesion',
+    'User not found': 'No se encontro una cuenta con ese email',
+    'Too many requests': 'Demasiados intentos. Por favor espera unos minutos.',
+    'User already registered': 'Este email ya esta registrado',
+  };
+  for (const [key, value] of Object.entries(map)) {
+    if (message.toLowerCase().includes(key.toLowerCase())) return value;
+  }
+  return message;
+}
+
 export default function LoginClient() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +55,7 @@ export default function LoginClient() {
       });
 
       if (error) {
-        setGeneralError(error.message);
+        setGeneralError(translateAuthError(error.message));
         setIsLoading(false);
         return;
       }
@@ -66,7 +80,7 @@ export default function LoginClient() {
       });
 
       if (error) {
-        setGeneralError(error.message);
+        setGeneralError(translateAuthError(error.message));
         return;
       }
 

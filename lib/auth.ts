@@ -45,24 +45,33 @@ export async function ensureUserProfile() {
   const session = await getSession();
   if (!session) return;
 
-  // Auto-promote admin email
+  const { data: existing } = await supabase
+    .from('users_profile')
+    .select('id, role')
+    .eq('id', session.user.id)
+    .maybeSingle();
+
+  if (existing) {
+    if (session.user.email === 'cryptohoy24@gmail.com' && existing.role !== 'admin') {
+      await supabase
+        .from('users_profile')
+        .update({ role: 'admin' })
+        .eq('id', session.user.id);
+    }
+    return;
+  }
+
   const role = session.user.email === 'cryptohoy24@gmail.com' ? 'admin' : 'user';
 
   const { error } = await supabase
     .from('users_profile')
-    .upsert(
-      {
-        id: session.user.id,
-        email: session.user.email,
-        role: role,
-      },
-      {
-        onConflict: 'id',
-        ignoreDuplicates: false
-      }
-    );
+    .insert({
+      id: session.user.id,
+      email: session.user.email,
+      role: role,
+    });
 
   if (error) {
-    console.error('Error upserting user profile:', error);
+    console.error('Error creating user profile:', error);
   }
 }
