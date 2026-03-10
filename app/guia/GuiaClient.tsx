@@ -52,12 +52,14 @@ export default function GuiaClient() {
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         router.push('/login');
       } else {
         setSession(session);
-        await ensureUserProfile();
+        (async () => {
+          await ensureUserProfile();
+        })();
       }
     });
 
